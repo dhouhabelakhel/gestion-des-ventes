@@ -24,6 +24,7 @@ def add_client(new_client):
     if new_client['code']=='' or new_client['nom']=='' or new_client['prenom']=='' or new_client['adresse']=='' :
             messagebox.showerror("Erreur", "fill all the inputs!")
     clients.append(new_client)
+    messagebox.showerror("Erreur", "insert client command")
     add_command_form()
     print (clients)
     return TRUE
@@ -81,8 +82,12 @@ def nbr_cmd_client(code,nom):
 app=Tk()
 app.geometry("800x500")
 app.title('gestion des ventes en lignes')
-Title=Label(app,text="'Gestion des ventes en lignes :",font="Script 35 bold", fg="#bd0b49",pady=10).grid(row=0,column=0,columnspan=2)
+def clear_interface():
+    for widget in app.winfo_children():
+        if widget != menu:
+            widget.destroy()
 def add_client_form():
+    clear_interface()
     code_client_label = Label(app,text="Code " ,font="Script 25 bold", fg="#bd0b49",pady=10).grid(row=1,column=1)
     nom_label= Label(app,text="nom ",font="Script 25 bold",fg="#bd0b49",pady=10).grid(row=2,column=1)
     prenom_label= Label(app,text="prenom ",font="Script 25 bold",fg="#bd0b49",pady=10).grid(row=3,column=1)
@@ -97,7 +102,9 @@ def add_client_form():
     code=Entry(textvariable=adresse_value).grid(row=4,column=2)
     confirm_button=Button(text="add",padx=5,pady=5 ,command=lambda:add_client({'code': code_value.get(), 'nom': nom_value.get(), 'prenom': prenom_value.get(), 'adresse': adresse_value.get(), 'commande': []}))
     confirm_button.place(x=100, y=280)
+
 def add_command_form():
+    clear_interface()
     code_client_label = Label(app,text="Code " ,font="Script 25 bold", fg="#bd0b49",pady=10).grid(row=1,column=1)
 
 menu = tk.Menu(app)
