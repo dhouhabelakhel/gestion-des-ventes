@@ -7,7 +7,7 @@ Created on Sat Mar 23 13:31:18 2024
 from tkinter import *
 import tkinter as tk
 from tkinter import ttk,messagebox
-
+from tkcalendar import Calendar, DateEntry
 clients=[]
 articles = [
     {'code': 'A001', 'libelle': 'Ordinateur portable', 'quantite_stock': 10, 'prix_unitaire': 800},
@@ -16,6 +16,7 @@ articles = [
     {'code': 'A004', 'libelle': 'Écouteurs sans fil', 'quantite_stock': 30, 'prix_unitaire': 100},
     {'code': 'A005', 'libelle': 'Imprimante', 'quantite_stock': 5, 'prix_unitaire': 300},
 ]
+commandes=[]
 def add_client(new_client):
     for client in clients:
         if client['code']==new_client['code']:
@@ -25,7 +26,7 @@ def add_client(new_client):
             messagebox.showerror("Erreur", "fill all the inputs!")
     clients.append(new_client)
     messagebox.showerror("Erreur", "insert client command")
-    add_command_form()
+    add_command_form(new_client['code'])
     print (clients)
     return TRUE
 def verif_qte(commande):
@@ -38,7 +39,7 @@ def add_commande(code,commande):
     for client in clients:
         if client['code']==code:
             if verif_qte(commande):
-                client['commande'].append(commande)
+                client['commande'].append({'num_cmd':len(commandes)+1,'commande':commande})
             
 def articles_commande(num_cmd,articles):
     for client in clients:
@@ -102,11 +103,30 @@ def add_client_form():
     code=Entry(textvariable=adresse_value).grid(row=4,column=2)
     confirm_button=Button(text="add",padx=5,pady=5 ,command=lambda:add_client({'code': code_value.get(), 'nom': nom_value.get(), 'prenom': prenom_value.get(), 'adresse': adresse_value.get(), 'commande': []}))
     confirm_button.place(x=100, y=280)
+def date_picker_show():
+    top = tk.Toplevel(app)
 
-def add_command_form():
+    ttk.Label(top, text='choisir la date: ').pack(padx=10, pady=10)
+
+    cal = DateEntry(top, width=12, background='darkblue',
+                    foreground='white', borderwidth=2)
+    cal.pack(padx=10, pady=10)
+
+def add_command_form(code=None):
     clear_interface()
-    code_client_label = Label(app,text="Code " ,font="Script 25 bold", fg="#bd0b49",pady=10).grid(row=1,column=1)
+    num_cmd_label=Label(app,text=f"Commande n° : {len(commandes)+1}",font="Script 20 bold", fg="#bd0b49",pady=10).grid(row=1,column=1)
+    code_client_label = Label(app,text="Code " ,font="Script 25 bold", fg="#bd0b49",pady=10).grid(row=2,column=1)
+    code_value=StringVar()
+    code_entry=Entry(textvariable=code_value)
+    code_entry.grid(row=2,column=2)
+    date_label = Label(app,text="Date " ,font="Script 25 bold", fg="#bd0b49",pady=10).grid(row=3,column=1)
+    date_picker=ttk.Button(app, text='DateEntry', command=date_picker_show).grid(row=3,column=2)
 
+    if code is not None:
+        code_value.set(code)
+        code_entry.configure(state='readonly')
+        
+    
 menu = tk.Menu(app)
 file_menu = tk.Menu(menu, tearoff=0)
 menu.add_cascade(label="Menu", menu=file_menu)
