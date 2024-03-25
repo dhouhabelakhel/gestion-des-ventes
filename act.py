@@ -9,13 +9,13 @@ import tkinter as tk
 from tkinter import ttk,messagebox
 from tkcalendar import Calendar, DateEntry
 clients=[]
-articles = [
-    {'code': 'A001', 'libelle': 'Ordinateur portable', 'quantite_stock': 10, 'prix_unitaire': 800},
-    {'code': 'A002', 'libelle': 'Smartphone', 'quantite_stock': 20, 'prix_unitaire': 600},
-    {'code': 'A003', 'libelle': 'Tablette', 'quantite_stock': 15, 'prix_unitaire': 400},
-    {'code': 'A004', 'libelle': 'Écouteurs sans fil', 'quantite_stock': 30, 'prix_unitaire': 100},
-    {'code': 'A005', 'libelle': 'Imprimante', 'quantite_stock': 5, 'prix_unitaire': 300},
-]
+articles = (
+    {'code_article': 'A001', 'libelle': 'Ordinateur portable', 'quantite_stock': 10, 'prix_unitaire': 800},
+    {'code_article': 'A002', 'libelle': 'Smartphone', 'quantite_stock': 20, 'prix_unitaire': 600},
+    {'code_article': 'A003', 'libelle': 'Tablette', 'quantite_stock': 15, 'prix_unitaire': 400},
+    {'code_article': 'A004', 'libelle': 'Écouteurs sans fil', 'quantite_stock': 30, 'prix_unitaire': 100},
+    {'code_article': 'A005', 'libelle': 'Imprimante', 'quantite_stock': 5, 'prix_unitaire': 300},
+)
 commandes=[]
 def add_client(new_client):
     for client in clients:
@@ -31,16 +31,25 @@ def add_client(new_client):
     return TRUE
 def verif_qte(commande):
     for article in commande['articles']:
-        if article['qte_cmd']>articles[article['code_article']]:
-            return False
+        code_article = article['code_article']
+        qte_cmd = article['qte_cmd']
+        for item in articles:
+            if item['code_article'] == code_article:
+                quantite_stock = item['quantite_stock']
+                if qte_cmd > quantite_stock:
+                    return False
     return True
+
         
 def add_commande(code,commande):
     for client in clients:
         if client['code']==code:
             if verif_qte(commande):
                 client['commande'].append({'num_cmd':len(commandes)+1,'commande':commande})
-            
+                print(client['commande'])
+                print(client)
+ 
+
 def articles_commande(num_cmd,articles):
     for client in clients:
         for commande in client['commande']:
@@ -103,14 +112,24 @@ def add_client_form():
     code=Entry(textvariable=adresse_value).grid(row=4,column=2)
     confirm_button=Button(text="add",padx=5,pady=5 ,command=lambda:add_client({'code': code_value.get(), 'nom': nom_value.get(), 'prenom': prenom_value.get(), 'adresse': adresse_value.get(), 'commande': []}))
     confirm_button.place(x=100, y=280)
-def date_picker_show():
-    top = tk.Toplevel(app)
+#https://www.plus2net.com/python/tkinter-DateEntry.php
+def get_selected_date():
+    selected_date = cal.get_date()
+    return selected_date
+   
 
-    ttk.Label(top, text='choisir la date: ').pack(padx=10, pady=10)
-
-    cal = DateEntry(top, width=12, background='darkblue',
-                    foreground='white', borderwidth=2)
-    cal.pack(padx=10, pady=10)
+     
+row=4
+selected_articles=[]
+def show_article(event,articles_select):
+    global row
+    article = articles_select.get()
+    article_label=Label(app,text=article).grid(row=row,column=5)
+    article_qte=tk.Spinbox(app, from_=0, to=100)
+    article_qte.grid(row=row,column=6)
+    row=row+1
+    selected_articles.append({'code_article':article,'qte_cmd':article_qte.get()})
+    print(selected_articles)
 
 def add_command_form(code=None):
     clear_interface()
@@ -120,8 +139,18 @@ def add_command_form(code=None):
     code_entry=Entry(textvariable=code_value)
     code_entry.grid(row=2,column=2)
     date_label = Label(app,text="Date " ,font="Script 25 bold", fg="#bd0b49",pady=10).grid(row=3,column=1)
-    date_picker=ttk.Button(app, text='DateEntry', command=date_picker_show).grid(row=3,column=2)
-
+    global cal 
+    cal = Calendar(app, selectmode='day', year=2024, month=3, day=24)
+    cal.grid(row=3, column=2)
+    articles_label= Label(app,text="articles  " ,font="Script 25 bold", fg="#bd0b49",pady=10).grid(row=4,column=1)
+    articles_select=ttk.Combobox( values=[article['libelle'] for article in articles],state="readonly")
+    articles_select.grid(row=4,column=2)
+    #https://stackoverflow.com/questions/40641130/how-to-use-a-comboboxselected-virtual-event-with-tkinter
+    articles_select.bind("<<ComboboxSelected>>",lambda event: show_article(event, articles_select))
+    confirm_button=Button(text="add",command=lambda:add_commande(code,
+                                                                 {'date':get_selected_date(),
+                                                                  'articles':selected_articles })).grid(row=5,column=1)
+   
     if code is not None:
         code_value.set(code)
         code_entry.configure(state='readonly')
