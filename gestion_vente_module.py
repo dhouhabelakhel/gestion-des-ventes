@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Mar 23 13:31:18 2024
-
-@author: user
-"""
 from tkinter import *
 import tkinter as tk
 from tkinter import ttk,messagebox
@@ -31,7 +25,7 @@ def add_client(new_client):
     return TRUE
 def verif_qte(commande):
     for article in commande['articles']:
-        code_article = article['libelle']
+        code_article = article['code_article']
         qte_cmd = article['qte_cmd']
         for item in articles:
             if item['code_article'] == code_article:
@@ -62,13 +56,13 @@ def total_cmd(num_cmd):
     total=0
     for client in clients:
         for commande in client['commandes']:
-            if str(commande['num_cmd']) ==str( num_cmd):
+            if commande['num_cmd']==num_cmd:
+                print('ll')
                 for article in commande['commande']['articles']:
                     for prix_article in articles:
                         if prix_article['libelle']==article['libelle']:
                             print(prix_article['prix_unitaire'])
-                            print(article['qte_cmd'])
-                            total=total+float(prix_article['prix_unitaire'])*int(article['qte_cmd'])
+                            total=total+(prix_article['prix_unitaire']*article['qte_cmd'])
     total_label=Label(app,text=total).grid(row=2,column=1)
     return total
 command_row=5
@@ -88,8 +82,7 @@ def affiche(code):
                 num_cmd=Label(app,text=commande['num_cmd']).grid(row=command_row,column=2)
                 date_label=Label(app,text='date').grid(row=command_row+1,column=1)
                 date=Label(app,text=commande['commande']['date']).grid(row=command_row+1,column=2)
-                total_label=Label(app,text='montant totale: ').grid(row=command_row+2,column=1)
-                print(total_cmd(commande['num_cmd']))
+                rotal_label=Label(app,text='montant totale: ').grid(row=command_row+2,column=1)
                 total=Label(app,text=total_cmd(commande['num_cmd'])).grid(row=command_row+2,column=2)
                 command_row=command_row+3
 def nbr_cmd(code):
@@ -135,7 +128,7 @@ def get_selected_date():
    
 selected_articles=[]
 def add_articles(article,qte_cmd):
-                 selected_articles.append({'libelle':article,'qte_cmd':qte_cmd})
+                 selected_articles.append({'code_article':article,'qte_cmd':qte_cmd})
                  print(selected_articles)
 
 row=4
@@ -201,16 +194,3 @@ def client_command_form():
     code_value=StringVar()
     code_entry=Entry(app,textvariable=code_value).grid(row=1,column=2)
     aff_button=Button(app,text='Afficher',command=lambda:affiche(code_value.get())).grid(row=1,column=3)
-menu = tk.Menu(app)
-file_menu = tk.Menu(menu, tearoff=0)
-menu.add_cascade(label="Menu", menu=file_menu)
-file_menu.add_command(label="Home", command=home_interface)
-file_menu.add_command(label="Add Client", command=add_client_form)
-file_menu.add_command(label="Add Command", command=add_command_form)
-file_menu.add_command(label="command total ", command=command_total_form)
-file_menu.add_command(label="afficher client ", command=client_command_form)
-
-
-app.geometry("1000x500")
-app.config(menu=menu)
-app.mainloop()
