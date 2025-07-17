@@ -203,9 +203,7 @@ Pour toute question ou problème :
   - Compilation en exécutable Windows
   - Installateur Windows inclus
 
-## 🎉 Remerciements
 
-Merci à tous les contributeurs qui ont rendu ce projet possible !
 
 ---
 
